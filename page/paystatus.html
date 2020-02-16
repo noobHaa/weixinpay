@@ -1,0 +1,87 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <title>聪明班尼在线支付</title>
+    <meta name="description" content="">
+    <script src="../js/jquery-3.1.1.min.js"></script>
+    <style>
+        html{
+            height: 100%;
+            width: 100%;
+        }
+        body{
+            height: 100%;
+            width: 100%;
+            margin: 0px 0px 0px 0px;
+        }
+
+        input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+            color: #bababa;
+        }
+
+        .content {
+            height: 100%;
+            width:100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: url("../img/paystatus_bg.jpg") no-repeat;
+            background-size:100% 100%;
+        }
+        .detail-status {
+            z-index: 99;
+            height: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .confirm-warn {
+            font-size: 36px;
+            color: #ffffff;
+        }
+
+        .repay-warn {
+            font-size: 30px;
+            color: #ffd62f;
+            margin-top: 200px;
+        }
+
+        .payed {
+            width: 500px;
+            height: 100px;
+            border-radius: 8px;
+        }
+
+
+    </style>
+</head>
+
+<body>
+<div class="content">
+    <!--<img class="pay-bg" src="../img/paystatus_bg.jpg">-->
+    <div class="detail-status">
+        <p class="confirm-warn">请确认支付是否完成</p>
+        <img class="payed" onclick="payed()" src="../img/payed.png">
+        <p class="repay-warn" onclick="repay()">支付遇到问题，重新支付</p>
+    </div>
+</div>
+<script>
+    $(function(){
+        let item = localStorage.getItem("phone");
+        if (null==item||undefined==item){
+            window.location.href="pay.html"
+        }
+    });
+    function payed(){
+        window.location.href="success.html"
+    }
+    function repay() {
+        window.history.go(-1);
+    }
+</script>
+</body>
+</html>

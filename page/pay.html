@@ -1,0 +1,239 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <title>聪明班尼在线支付</title>
+    <meta name="description" content="">
+    <script src="../js/jquery-3.1.1.min.js"></script>
+    <style>
+        input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+            color: #bababa;
+        }
+        html{
+            height: 100%;
+            width: 100%;
+        }
+        body{
+            height: 100%;
+            width: 100%;
+            margin: 0px 0px 0px 0px;
+        }
+        .content {
+            height: 100%;
+            width:100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url("../img/pay_bg.jpg") no-repeat;
+            background-size:100% 100%;
+        }
+        .detail {
+            z-index: 99;
+            height: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .money {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .mui-input-group {
+            background: white;
+            width: 800px;
+            height: 403px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mui-input-row {
+            height: 100px;
+            width: 760px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            border-bottom: 1px solid #bababa;
+            line-height: 80px;
+        }
+
+        .mui-input-clear {
+            width: 580px;
+            border: none;
+            line-height: 80px;
+            font-size: 26px;
+        }
+
+        .row-code {
+            width: 180px;
+            height: 80px;
+            background-color: whitesmoke;
+            border-radius: 10px;
+        }
+
+        .sb-button {
+            width: 800px;
+            height: 100px;
+            margin-top: 40px;
+            background: url("../img/commit.png") no-repeat;
+            background-size:100% 100%;
+        }
+        .numDiv{
+            font-size: 26px;
+            text-align: center;
+            margin-left: 65px;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="content">
+    <!--<img class="pay-bg" src="../img/pay_bg.jpg">-->
+    <div class="detail">
+        <div class="money">
+            <div style="font-size: 24px;">支付金额</div>
+            <div style="font-size: 52px;">￥49.00</div>
+        </div>
+        <form class="mui-input-group" id="form" name="Form" method="post">
+            <div class="mui-input-row">
+                <input type="text" class="mui-input-clear" placeholder="请输入孩子姓名" id="name" value="">
+                <div class="row-code" hidden>
+                    <img src="../img/code.png">
+                </div>
+            </div>
+            <div class="mui-input-row">
+                <input type="text" class="mui-input-clear" placeholder="请输入孩子所在幼儿园" id="kinderGarten" value="">
+                <div class="row-code" hidden>
+                    <img src="../img/code.png">
+                </div>
+            </div>
+            <div class="mui-input-row">
+                <input type="text" class="mui-input-clear" oninput="value=value.replace(/[^\d]/g,'')" placeholder="请输入您的手机号" id="phone" value="" maxlength=11 onblur="verifyPhone()">
+                <div class="row-code" hidden>
+                    <img  src="../img/code.png">
+                </div>
+            </div>
+            <div class="mui-input-row">
+                <input type="text" class="mui-input-clear" placeholder="请输入验证码" id="code" value="">
+                <div class="row-code">
+                    <img id="verifyCode"  onclick="getCode()"  src="../img/code.png">
+                    <div id='numDiv' class="numDiv">60s</div>
+                </div>
+            </div>
+        </form>
+        <div class="sb-button" onclick="commit()">
+            <!--<img src="../img/commit.png">-->
+        </div>
+    </div>
+</div>
+</body>
+<script src="../js/md5.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" >
+    var num=60;
+    const HOST="http://192.168.5.8:8080"
+    $(function(){
+        localStorage.clear();
+        document.getElementById("verifyCode").style.display="inline";
+        document.getElementById("numDiv").style.display="none";
+    });
+    function getCode(){
+        let phone = $("#phone").val();
+        if(!(/^1[3456789]\d{9}$/.test(phone))){
+            alert("手机号码有误，请重填");
+            $("#phone").val("")
+            return false;
+        }
+        document.getElementById("verifyCode").style.display="none";
+        document.getElementById("numDiv").style.display="inline";
+        let myUrl = HOST;
+        let strs = myUrl[0] + myUrl[Math.floor((myUrl.length + 1) / 2)] + myUrl[myUrl.length - 1];
+        let safeCode = md5(strs + phone);
+        let params={
+            "phoneNumber":phone,
+            "verifyCodeMode":"cth_pay",
+            "appName":"聪明班尼在线支付",
+            "safeCode":safeCode,
+            "dataType":"getVerifyCodeSafe"
+        };
+        var url=HOST+'/LinkMind/appServlet?params='+JSON.stringify(params)
+        $.ajax({
+            url:url,
+            dataType : "jsonp",
+            type:'GET',
+            success:function (data,status) {
+                alert("验证码发送成功")
+            }
+        })
+        num=60;
+        numTimer();
+    }
+    //倒计时
+    function numTimer() {
+        var int=setInterval(function () {
+            if (num>0) {
+                num--;
+            }else{
+                document.getElementById("verifyCode").style.display="inline";
+                document.getElementById("numDiv").style.display="none";
+                document.getElementById("numDiv").innerHTML="60s";
+                clearInterval(int);
+            }
+        document.getElementById("numDiv").innerHTML=num+"s";
+        },1000);
+    }
+
+    function verifyPhone() {
+        event.stopPropagation();
+        let phone = $("#phone").val();
+        if(!(/^1[3456789]\d{9}$/.test(phone))){
+            alert("手机号码有误，请重填");
+            $("#phone").val("")
+            return false;
+        }
+    }
+    function commit() {
+        let name = $("#name").val()
+        if(null==name||''==name) {
+            alert("请输入孩子姓名");
+            return false
+        }
+        let kinderGarten = $("#kinderGarten").val()
+        if(null==kinderGarten||''==kinderGarten) {
+            alert("请输入孩子所在幼儿园");
+            return false
+        }
+        let phone = $("#phone").val()
+        if(null==phone||''==phone) {
+            alert("请输入您的手机号");
+            return false
+        }else {
+            if(!(/^1[3456789]\d{9}$/.test(phone))){
+                alert("手机号码有误，请重填");
+                return false;
+            }
+        }
+        let code =  $("#code").val()
+        if(null==code||''==code) {
+            alert("请输入验证码");
+            return false
+        }
+        var param={
+            name,kinderGarten,phone,code
+        }
+        console.log(param)
+        window.location.href="paystatus.html";
+        localStorage.setItem("phone",phone);
+
+    }
+</script>
+</html>
