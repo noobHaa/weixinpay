@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <title>聪明班尼在线支付</title>
     <meta name="description" content="">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta name="viewport" content="inital-scale=1.0,maximum-scale=1.0,user-scalable=no;">
     <script src="../js/jquery-3.1.1.min.js"></script>
     <style>
         html{
@@ -17,6 +19,8 @@
         }
         input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
             color: #bababa;
+            border:0px;
+            outline:none;
         }
 
         .content {
@@ -91,5 +95,27 @@
             window.location.href="pay.html"
         }
     });
+    window.onload = function () {
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        });
+        var lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            var now = (new Date()).getTime();
+            // 如果在300ms内触发两次touchend，就阻止默认事件
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    };
 </script>
 </html>

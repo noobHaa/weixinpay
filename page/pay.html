@@ -4,10 +4,15 @@
     <meta charset="utf-8">
     <title>聪明班尼在线支付</title>
     <meta name="description" content="">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />-->
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta name="viewport" content="inital-scale=1.0,maximum-scale=1.0,user-scalable=no;">
     <script src="../js/jquery-3.1.1.min.js"></script>
     <style>
         input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
             color: #bababa;
+            border:0px;
+            outline:none;
         }
         html{
             height: 100%;
@@ -77,20 +82,27 @@
             width: 180px;
             height: 80px;
             background-color: whitesmoke;
-            border-radius: 10px;
+            border-radius: 20px;
         }
 
         .sb-button {
             width: 800px;
             height: 100px;
             margin-top: 40px;
-            background: url("../img/commit.png") no-repeat;
-            background-size:100% 100%;
+            background: rgb(254,212,45);
+            text-align: center;
+            line-height: 100px;
+            font-size: 42px;
+            font-weight: bold;
+            border-radius: 10px;
+            /*background: url("../img/commit.png") no-repeat;*/
+            /*background-size:100% 100%;*/
         }
         .numDiv{
             font-size: 26px;
             text-align: center;
             margin-left: 65px;
+            border-radius: 20px;
         }
 
     </style>
@@ -123,7 +135,7 @@
                     <img  src="../img/code.png">
                 </div>
             </div>
-            <div class="mui-input-row">
+            <div class="mui-input-row" style="border-bottom:none">
                 <input type="text" class="mui-input-clear" placeholder="请输入验证码" id="code" value="">
                 <div class="row-code">
                     <img id="verifyCode"  onclick="getCode()"  src="../img/code.png">
@@ -133,14 +145,15 @@
         </form>
         <div class="sb-button" onclick="commit()">
             <!--<img src="../img/commit.png">-->
+            确认支付
         </div>
     </div>
 </div>
 </body>
-<script src="../js/md5.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/md5.js" language="javascript"  charset="utf-8"></script>
 <script type="text/javascript" >
     var num=60;
-    const HOST="http://192.168.5.8:8080"
+    const HOST="http://192.168.5.8"
     $(function(){
         localStorage.clear();
         document.getElementById("verifyCode").style.display="inline";
@@ -157,7 +170,7 @@
         document.getElementById("numDiv").style.display="inline";
         let myUrl = HOST;
         let strs = myUrl[0] + myUrl[Math.floor((myUrl.length + 1) / 2)] + myUrl[myUrl.length - 1];
-        let safeCode = md5(strs + phone);
+        let safeCode =$.md5(strs + phone);
         let params={
             "phoneNumber":phone,
             "verifyCodeMode":"cth_pay",
@@ -165,17 +178,22 @@
             "safeCode":safeCode,
             "dataType":"getVerifyCodeSafe"
         };
-        var url=HOST+'/LinkMind/appServlet?params='+JSON.stringify(params)
+        var url='http://192.168.5.8:9000/LinkMind/appServlet?params='+JSON.stringify(params)
         $.ajax({
             url:url,
-            dataType : "jsonp",
+            dataType : "text",
             type:'GET',
             success:function (data,status) {
-                alert("验证码发送成功")
+                console.log(data);
+                num=60;
+                document.getElementById("numDiv").innerHTML="60s";
+                numTimer();
+            },
+            //失败/超时
+            error:function(XMLHttpRequest,textStatus,errorThrown){
+                alert("服务错误，验证码发送失败")
             }
         })
-        num=60;
-        numTimer();
     }
     //倒计时
     function numTimer() {
@@ -185,7 +203,6 @@
             }else{
                 document.getElementById("verifyCode").style.display="inline";
                 document.getElementById("numDiv").style.display="none";
-                document.getElementById("numDiv").innerHTML="60s";
                 clearInterval(int);
             }
         document.getElementById("numDiv").innerHTML=num+"s";
@@ -234,6 +251,57 @@
         window.location.href="paystatus.html";
         localStorage.setItem("phone",phone);
 
+        // if (typeof WeixinJSBridge == "undefined"){
+        //     if( document.addEventListener ){
+        //         document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+        //     }else if (document.attachEvent){
+        //         document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+        //         document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+        //     }
+        // }else{
+        //     onBridgeReady();
+        // }
     }
+
+    window.onload = function () {
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        });
+        var lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            var now = (new Date()).getTime();
+            // 如果在300ms内触发两次touchend，就阻止默认事件
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    };
+
+    // function onBridgeReady(){
+    //     WeixinJSBridge.invoke(
+    //         'getBrandWCPayRequest', {
+    //             "appId":"wx19f360a42e8bc31d",     //公众号名称，由商户传入
+    //             "timeStamp":(new Date()).getTime(),         //时间戳，自1970年以来的秒数
+    //             "nonceStr":"e61463f8efa94090b1f366cccfbbb444", //随机串
+    //             "package":"prepay_id=u802345jgfjsdfgsdg888",
+    //             "signType":"MD5",         //微信签名方式：
+    //             "paySign":"70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
+    //         },
+    //         function(res){
+    //             if(res.err_msg == "get_brand_wcpay_request:ok" ){
+    //                 // 使用以上方式判断前端返回,微信团队郑重提示：
+    //                 //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+    //             }
+    //         });
+    // }
 </script>
 </html>

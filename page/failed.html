@@ -43,35 +43,32 @@
             align-items: center;
             margin-top: 40%;
         }
-
-        .confirm-warn {
-            font-size: 36px;
-            color: #ffffff;
-        }
-
         .repay-warn {
             font-size: 30px;
             color: #ffd62f;
-            margin-top: 200px;
+            margin-top: 10px;
         }
 
         .payed {
             width: 500px;
             height: 100px;
             border-radius: 20px;
+            margin-top: 100px;
         }
-
-
+        .failed{
+            width:79px ;
+            height: 79px;
+            border-radius: 99px;
+        }
     </style>
 </head>
 
 <body>
 <div class="content">
-    <!--<img class="pay-bg" src="../img/paystatus_bg.jpg">-->
     <div class="detail-status">
-        <p class="confirm-warn">请确认支付是否完成</p>
-        <img class="payed" onclick="payed()" src="../img/payed.png">
+        <img class="failed" src="../img/failed.png">
         <p class="repay-warn" onclick="repay()">支付遇到问题，重新支付</p>
+        <img class="payed" onclick="payed()" src="../img/repay.png">
     </div>
 </div>
 <script>
@@ -81,9 +78,9 @@
             window.location.href="pay.html"
         }
     });
-    function payed(){
-        window.location.href="success.html"
-    }
+    // function payed(){
+    //     window.location.href="success.html"
+    // }
     function repay() {
         window.history.go(-1);
     }
