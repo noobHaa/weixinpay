@@ -153,6 +153,7 @@
 <script src="../js/md5.js" language="javascript"  charset="utf-8"></script>
 <script type="text/javascript" >
     var num=60;
+    //todo 用于MD5加密，环境不同需要修改
     const HOST="http://192.168.5.8"
     $(function(){
         localStorage.clear();
@@ -178,6 +179,7 @@
             "safeCode":safeCode,
             "dataType":"getVerifyCodeSafe"
         };
+        //todo 环境不同需要修改
         var url='http://192.168.5.8:9000/LinkMind/appServlet?params='+JSON.stringify(params)
         $.ajax({
             url:url,
